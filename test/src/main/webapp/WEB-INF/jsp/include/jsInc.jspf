@@ -1,0 +1,83 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%    
+/**
+ * 자바스크립트 및 CSS include 임포트
+ * @author 김성천
+ * @since 2015. 9. 11. 오후 5:59:42
+ * @version 1.0
+ * @see
+ *
+ * <pre>
+ * << 개정이력(Modification Information) >>
+ *   
+ *  수정일		수정자		수정내용
+ *  -------    	--------    ---------------------------
+ * 2015. 9. 11. 	김성천  최초생성
+ *
+ * </pre>
+ */
+ %>
+
+<!-- 자바스크립트 -->
+<!-- 제이쿼리 -->
+<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<script src="//ie7-js.googlecode.com/svn/version/2.1(beta4)/IE9.js"></script>
+<![endif]-->
+<script type="text/javascript" src="<c:url value='/js/smpp/jquery-1.11.3.min.js' />"></script>
+<script type="text/javascript" src="<c:url value='/js/smpp/jquery.flow.1.1.min.js'/>"></script>
+<script type="text/javascript" src="<c:url value='/js/smpp/jquery.number.min.js'/>" ></script>
+<script type="text/javascript" src="<c:url value='/js/smpp/jquery.form.min.js'/>" ></script>
+<script type="text/javascript" src="<c:url value='/js/smpp/jquery.bxslider.min.js'/>"></script>
+<script type="text/javascript" src="<c:url value='/js/smpp/jquery.maskedinput.js'/>"></script>
+<script type="text/javascript" src="<c:url value='/plugin/jquery-ui-1.11.3/jquery-ui.min.js'/>"></script>
+<!-- 메인스크립트  -->
+<script type="text/javascript" src="<c:url value='/js/smpp/CommUtil.js'/>" ></script>
+<!-- 공통스크립트  -->
+<script type="text/javascript" src="<c:url value='/js/smpp/contents.js'/>" ></script>
+<!-- Validation 스크립트 -->
+<script type="text/javascript" src="<c:url value='/js/smpp/validUtil.js'/>"></script>
+<!-- 멀티셀렉트 -->
+<script type="text/javascript" src="<c:url value='/js/smpp/multiselect.js'/>"></script>
+<!-- jquery cookie plugin -->
+<script type="text/javascript" src="<c:url value='/js/smpp/jquery.cookie.js'/>"></script>
+<!-- 팝업JS -->
+<!-- fancybox 팝업 및 섬네일 이미지처리 스크립트 -->
+<script type="text/javascript" src="<c:url value='/plugin/fancy/jquery.fancybox.js?v=2.1.5'/>"></script>
+<script type="text/javascript" src="<c:url value='/plugin/fancy/helpers/jquery.fancybox-buttons.js'/>"></script>
+<!-- 리스트 폼 생성 스크립트 -->
+<script type="text/javascript" src="<c:url value='/js/smpp/dynamic_list_helper.js'/>"></script>
+<!-- 전자정부프레임워크 파일업로드 -->
+<script type="text/javascript" src="<c:url value='/js/egovframework/com/cmm/fms/EgovMultiFile.js'/>" ></script>
+<!-- 전자정부프레임워크 달력 -->
+<script type="text/javascript" src="<c:url value='/js/egovframework/com/sym/cal/EgovCalPopup.js' />"></script>
+<!-- lnb 트리메뉴 -->
+<script type="text/javascript" src="<c:url value='/js/smpp/treemenu.js'/>"></script>
+<!-- Morris 차트 (그래프) -->
+<script type="text/javascript" src="<c:url value='/plugin/morris/raphael-min.js'/>"></script>
+<script type="text/javascript" src="<c:url value='/plugin/morris/prettify.min.js'/>"></script>
+<script type="text/javascript" src="<c:url value='/plugin/morris/morris.min.js'/>"></script>
+<!-- 기업변경 정보 팝업 스크립트 -->
+<script type="text/javascript" src="<c:url value='/js/smpp/popOver.js'/>" ></script>
+<!-- 자바스크립트 끝 -->
+
+<!-- 스타일시트 -->
+<!-- fancybox 팝업 및 섬네일 이미지처리 스타일시트 -->
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/plugin/fancy/jquery.fancybox.css?v=2.1.5" media="screen" />
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/plugin/fancy/helpers/jquery.fancybox-buttons.css" media="screen" />
+<!-- Morris 차트 스타일시트 -->
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/plugin/morris/prettify.min.css"/>
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/plugin/morris/morris.css"/>
+<!-- 폰트 -->
+<%-- <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/smpp/font/nanumgothic.css" />
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/smpp/font/nanummyeongjo.css" /> --%>
+<!-- 메인 CSS -->
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/plugin/jquery-ui-1.11.3/jquery-ui.min.css" />
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/smpp/introduce.css" />
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/smpp/style.css" />
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/smpp/print.css" media="print">
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/smpp/layout.css" />
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/smpp/common.css" />
+<!-- 기업변경 정보 팝업 스타일 -->
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/smpp/popOver.css" />
+<!-- 스타일시트 끝 -->

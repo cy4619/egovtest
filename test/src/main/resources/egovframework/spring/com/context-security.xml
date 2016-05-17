@@ -1,0 +1,207 @@
+<beans  xmlns:security="http://www.springframework.org/schema/security"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+						http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd
+						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd">
+ 
+ 	<!-- 시큐리티 제외 패턴 -->
+ 	<security:http pattern="/css/**" security="none"/>
+	<security:http pattern="/html/**" security="none"/>
+    <security:http pattern="/images/**" security="none"/>
+ 	<security:http pattern="/js/**" security="none"/>
+ 	<security:http pattern="/plugin/**" security="none"/>
+ 	<security:http pattern="/resource/**" security="none"/>
+ 	<security:http pattern="\A/WEB-INF/jsp/.*\Z" request-matcher="regex" security="none"/>
+ 
+	<!-- 시큐리티 기본설정 
+		access-denied-page : 권한이 없는 페이지 접속시 주소
+		authentication-success-handler-ref : 인증성공 핸들러
+		authentication-failure-url : 인증실패시 주소
+		login-page : 로그인 페이지
+		logout-success-url : 로그아웃 성공시 주소
+	-->
+	<security:http access-denied-page="/sec/ram/accessDenied.do" request-matcher="regex">
+		<security:form-login 
+					authentication-success-handler-ref="loginSuccessHandler"
+					authentication-failure-url="/uat/uia/egovLoginUsr.do?login_error=1"
+					login-page="/uat/uia/egovLoginUsr.do" />
+		<security:anonymous/>
+		<security:logout logout-success-url="/uat/uia/egovLoginUsr.do"/>
+		<!-- for authorization -->
+		<security:custom-filter before="FILTER_SECURITY_INTERCEPTOR" ref="filterSecurityInterceptor"/>
+	</security:http>	
+ 
+  	<!-- 인증성공시 분기처리 핸들러 
+  		alwaysUseDefaultTargetUrl : 로그인성공시 항상 같은 페이지로 이동할지 여부(boolean)
+  		defaultTargetUrl : 로그인성공시 이동되는 기본주소
+  		
+  		로그인후에 조건별  분기처리가 필요할경우 "alwaysUseDefaultTargetUrl" 을 false 로 변경하고
+  		LoginSuccessHandler 클래스에 분기처리 로직을 추가한다.
+  	-->
+ 	<bean id="loginSuccessHandler" class="egovframework.com.sec.security.common.LoginSuccessHandler">
+ 		<property name="alwaysUseDefaultTargetUrl" value="false"></property>
+ 		<property name="defaultTargetUrl" value="/uss/ion/pwm/listPopup.do"></property>
+ 	</bean>
+ 
+
+ 
+ 	<!-- 
+ 		sqlHierarchicalRoles : 롤 계층구조 정의
+ 		sqlRolesAndUrl : URL 별 접근 권한 조회
+ 		sqlRolesAndMethod : 메서드별 접근 권한 조회
+ 		sqlRolesAndPointcut : 포인트컷 표현식을 이용한 접근권한 조회
+ 	 -->
+	<bean id="securedObjectDAO" class="egovframework.com.cmm.util.SecuredObjectDAO" >
+		<property name="dataSource" ref="dataSource"/>
+		<property name="sqlHierarchicalRoles">
+			<value>
+				SELECT a.CHLDRN_ROLE child, a.PARNTS_ROLE parent
+				FROM COMTNROLES_HIERARCHY a LEFT JOIN COMTNROLES_HIERARCHY b on (a.CHLDRN_ROLE = b.PARNTS_ROLE)
+			</value>
+		</property>
+		<property name="sqlRolesAndUrl">
+			<value>
+				SELECT a.ROLE_PTTRN url, b.AUTHOR_CODE authority FROM COMTNROLEINFO a, COMTNAUTHORROLERELATE b
+				WHERE a.ROLE_CODE = b.ROLE_CODE AND a.ROLE_TY = 'url'  ORDER BY a.ROLE_SORT,a.ROLE_PTTRN
+			</value>
+		</property>
+		<property name="sqlRolesAndMethod">
+			<value>
+				SELECT a.ROLE_PTTRN method, b.AUTHOR_CODE authority
+				FROM COMTNROLEINFO a, COMTNAUTHORROLERELATE b
+				WHERE a.ROLE_CODE = b.ROLE_CODE
+				AND a.ROLE_TY = 'method'  ORDER BY a.ROLE_SORT
+			</value>
+		</property>
+		<property name="sqlRolesAndPointcut">
+			<value>
+				SELECT a.ROLE_PTTRN pointcut, b.AUTHOR_CODE authority
+				FROM COMTNROLEINFO a, COMTNAUTHORROLERELATE b
+				WHERE a.ROLE_CODE = b.ROLE_CODE
+				AND a.ROLE_TY = 'pointcut'  ORDER BY a.ROLE_SORT
+			</value>
+		</property>
+	</bean>
+ 
+ 	<!-- 
+ 		롤 계층 구조 정의
+ 		계층구조를 XML 상에서 관리할 경우 XML 사용부분을 주석 해제한다.
+ 		DB 상에서 관리할경우 DB 사용부분을 주석 해제한다.
+ 	 -->
+	<bean id="roleHierarchy" class="org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl" >
+		<!-- XML 사용 
+		<property name="hierarchy">
+			<value>
+				ROLE_ADMIN > ROLE_USER
+				ROLE_USER > ROLE_RESTRICTED
+				ROLE_RESTRICTED > IS_AUTHENTICATED_FULLY
+				IS_AUTHENTICATED_REMEMBERED > IS_AUTHENTICATED_ANONYMOUSLY
+			</value>
+		</property>
+		-->
+		<!-- DB 사용 -->
+		<property name="hierarchy" ref="hierarchyStrings"/>
+	</bean>
+ 
+	<bean id="hierarchyStrings" class="egovframework.rte.fdl.security.userdetails.hierarchicalroles.HierarchyStringsFactoryBean" init-method="init">
+		<property name="securedObjectService" ref="securedObjectService"/>
+	</bean>
+ 
+	<bean id="filterSecurityInterceptor" class="org.springframework.security.web.access.intercept.FilterSecurityInterceptor">	
+<!-- 		<property name="authenticationManager" ref="org.springframework.security.authenticationManager" />
+		<property name="accessDecisionManager" ref="org.springframework.security.access.vote.AffirmativeBased#0" />
+		<property name="securityMetadataSource" ref="databaseSecurityMetadataSource" /> -->
+		<property name="authenticationManager" ref="org.springframework.security.authenticationManager" />
+		<property name="accessDecisionManager" ref="consensusBased" />
+		<property name="securityMetadataSource" ref="databaseSecurityMetadataSource" />		
+	</bean>
+	
+	<bean id="consensusBased" class="egovframework.com.cmm.util.ConsensusBased">
+	<property name="decisionVoters">
+		<list>
+			<bean class="org.springframework.security.access.vote.RoleVoter">
+				<property name="rolePrefix" value="ROLE_" />
+			</bean>
+			<bean class="org.springframework.security.access.vote.AuthenticatedVoter" />
+		</list>
+	</property>
+	</bean>
+
+	<bean id="databaseSecurityMetadataSource" class="egovframework.com.cmm.util.EgovReloadableFilterInvocationSecurityMetadataSource">
+		<constructor-arg ref="requestMap" />	
+		<property name="securedObjectService" ref="securedObjectService"/>
+	</bean>
+	
+	<bean id="securedObjectService" class="egovframework.com.cmm.util.SecuredObjectServiceImpl">
+		<property name="securedObjectDAO" ref="securedObjectDAO"/>
+		<property name="requestMatcherType" value="regex"/>	<!--  default : ant -->
+	</bean>
+ 
+	<!--  url  -->
+	<bean id="requestMap" class="egovframework.rte.fdl.security.intercept.UrlResourcesMapFactoryBean" init-method="init">
+		<property name="securedObjectService" ref="securedObjectService"/>
+	</bean>
+ 
+	<!--
+	authentication-manager 기본 생성 bean id :  org.springframework.security.authenticationManager (alias로 변경할 수 있음)
+	-->
+	<security:authentication-manager>
+		<security:authentication-provider user-service-ref="jdbcUserService">
+			<security:password-encoder  hash="plaintext" base64="false"/>
+		</security:authentication-provider>		
+	</security:authentication-manager>	
+ 
+ 	<!-- 
+ 		JDBC 기반 인증서비스
+ 		usersByUsernameQuery : 사용자 인증쿼리
+ 		authoritiesByUsernameQuery : 사용자 권한쿼리
+ 		mapClass : 사용자 인증쿼리 실행후 결과값을 맵핑하여 세션으로 저장한다.
+ 	 -->
+	<bean id="jdbcUserService" class="egovframework.rte.fdl.security.userdetails.jdbc.EgovJdbcUserDetailsManager" >
+		<property name="usersByUsernameQuery" value="SELECT USER_ID, ESNTL_ID AS PASSWORD, 1 ENABLED, USER_NM, USER_ZIP,
+                                                     USER_ADRES, USER_EMAIL, USER_SE, ORGNZT_ID, ESNTL_ID,
+                                                     (select a.ORGNZT_NM from COMTNORGNZTINFO a where a.ORGNZT_ID = m.ORGNZT_ID) ORGNZT_NM
+                                                     FROM COMVNUSERMASTER m WHERE CONCAT(USER_SE, USER_ID) = ?"/>
+		<property name="authoritiesByUsernameQuery" value="SELECT A.SCRTY_DTRMN_TRGET_ID USER_ID, A.AUTHOR_CODE AUTHORITY
+                                                             FROM COMTNEMPLYRSCRTYESTBS A, COMVNUSERMASTER B
+                                                             WHERE A.SCRTY_DTRMN_TRGET_ID = B.ESNTL_ID AND B.USER_ID = ?"/>
+		<property name="roleHierarchy" ref="roleHierarchy"/>
+		<property name="dataSource" ref="dataSource"/>
+		<property name="mapClass" value="egovframework.com.sec.security.common.EgovSessionMapping"/>
+	</bean>
+ 
+	<!-- method -->
+	<bean id="methodSecurityMetadataSourceAdvisor" class="org.springframework.security.access.intercept.aopalliance.MethodSecurityMetadataSourceAdvisor">
+		<constructor-arg value="methodSecurityInterceptor" />
+		<constructor-arg ref="delegatingMethodSecurityMetadataSource" />
+		<constructor-arg value="delegatingMethodSecurityMetadataSource" />
+	</bean>
+ 
+	<bean id="methodSecurityInterceptor" class="org.springframework.security.access.intercept.aopalliance.MethodSecurityInterceptor">
+		<property name="validateConfigAttributes" value="false" />
+		<property name="authenticationManager" ref="org.springframework.security.authenticationManager"/>
+		<property name="accessDecisionManager" ref="org.springframework.security.access.vote.AffirmativeBased#0"/>
+		<property name="securityMetadataSource" ref="delegatingMethodSecurityMetadataSource" />
+	</bean>
+ 
+    <bean id="delegatingMethodSecurityMetadataSource" class="org.springframework.security.access.method.DelegatingMethodSecurityMetadataSource">
+        <constructor-arg>
+            <list>
+                <ref bean="methodSecurityMetadataSources" />
+                <bean class="org.springframework.security.access.annotation.SecuredAnnotationSecurityMetadataSource" />
+                <bean class="org.springframework.security.access.annotation.Jsr250MethodSecurityMetadataSource" />
+            </list>
+        </constructor-arg>
+    </bean>
+ 
+	<bean id="methodSecurityMetadataSources" class="org.springframework.security.access.method.MapBasedMethodSecurityMetadataSource">
+		<constructor-arg ref="methodMap" />
+	</bean>
+ 
+	<bean id="methodMap" class="egovframework.rte.fdl.security.intercept.MethodResourcesMapFactoryBean" init-method="init">
+		<property name="securedObjectService" ref="securedObjectService"/>
+		<property name="resourceType" value="method"/>
+	</bean>
+</beans>
