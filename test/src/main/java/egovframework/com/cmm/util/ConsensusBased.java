@@ -45,52 +45,57 @@ public class ConsensusBased extends AbstractAccessDecisionManager {
      */
     public void decide(Authentication authentication, Object object, Collection<ConfigAttribute> configAttributes)
             throws AccessDeniedException {
-        int grant = 0;
-        int deny = 0;
-        int abstain = 0;
+    	int grant = 0;
+    	int deny = 0;
+    	int abstain = 0;
+    	
+    	for (ConfigAttribute configAttribute : configAttributes) {
+    		ConfigAttributeImpl configAttributeImpl=(ConfigAttributeImpl) configAttribute;
+    		
+    		for (AccessDecisionVoter voter :  getDecisionVoters()) {
+    			int result = voter.vote(authentication, object, configAttributeImpl.getAttributeSet());
+    			
+    			if (logger.isDebugEnabled()) {
+    				logger.debug("URL: "+ object + ", configAttributes: "+ configAttributes + ", Voter: " + voter + ", returned: " + result);
+    			}
+    			
+    			switch (result) {
+    			case AccessDecisionVoter.ACCESS_GRANTED:
+    				grant++;
+    				
+    				break;
+    				
+    			case AccessDecisionVoter.ACCESS_DENIED:
+    				deny++;
+    				
+    				break;
+    				
+    			default:
+    				abstain++;
+    				
+    				break;
+    			}
+    		}
+		}
+    	
+    	if (grant > deny) {
+    		return;
+    	}
+    	
+    	if (deny > grant) {
+    		throw new AccessDeniedException(messages.getMessage("AbstractAccessDecisionManager.accessDenied",
+    				"Access is denied"));
+    	}
+    	
+    	if ((grant == deny) && (grant != 0)) {
+    		if (this.allowIfEqualGrantedDeniedDecisions) {
+    			return;
+    		} else {
+    			throw new AccessDeniedException(messages.getMessage("AbstractAccessDecisionManager.accessDenied",
+    					"Access is denied"));
+    		}
+    	}
 
-        for (AccessDecisionVoter voter :  getDecisionVoters()) {
-            int result = voter.vote(authentication, object, configAttributes);
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("URL: "+ object + ", configAttributes: "+ configAttributes + ", Voter: " + voter + ", returned: " + result);
-            }
-
-            switch (result) {
-            case AccessDecisionVoter.ACCESS_GRANTED:
-                grant++;
-
-               break;
-
-            case AccessDecisionVoter.ACCESS_DENIED:
-                deny++;
-
-                break;
-
-            default:
-                abstain++;
-
-                break;
-            }
-        }
-
-        if (grant > deny) {
-            return;
-        }
-
-        if (deny > grant) {
-            throw new AccessDeniedException(messages.getMessage("AbstractAccessDecisionManager.accessDenied",
-                    "Access is denied"));
-        }
-
-        if ((grant == deny) && (grant != 0)) {
-            if (this.allowIfEqualGrantedDeniedDecisions) {
-                return;
-            } else {
-                throw new AccessDeniedException(messages.getMessage("AbstractAccessDecisionManager.accessDenied",
-                        "Access is denied"));
-            }
-        }
 
         // To get this far, every AccessDecisionVoter abstained
         checkAllowIfAllAbstainDecisions();

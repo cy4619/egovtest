@@ -1,5 +1,6 @@
 package egovframework.com.cmm.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -19,6 +20,7 @@ import org.springframework.security.web.access.intercept.FilterInvocationSecurit
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import egovframework.rte.fdl.security.securedobject.EgovSecuredObjectService;
+import egovframework.rte.fdl.security.securedobject.impl.SelfRegexRequestMatcher;
 
 
 public class EgovReloadableFilterInvocationSecurityMetadataSource implements FilterInvocationSecurityMetadataSource {
@@ -30,7 +32,6 @@ public class EgovReloadableFilterInvocationSecurityMetadataSource implements Fil
 	private final Map<RequestMatcher, Collection<ConfigAttribute>> requestMap;
 
 	public EgovReloadableFilterInvocationSecurityMetadataSource(LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>> requestMap) {
-
         this.requestMap = requestMap;
     }
 
@@ -45,15 +46,22 @@ public class EgovReloadableFilterInvocationSecurityMetadataSource implements Fil
     }
 
     public Collection<ConfigAttribute> getAttributes(Object object) {
-        final HttpServletRequest request = ((FilterInvocation) object).getRequest();
+		List<ConfigAttribute> attributes = new ArrayList<ConfigAttribute>();
+		final HttpServletRequest request = ((FilterInvocation) object).getRequest();
+/*		for (Map.Entry<RequestMatcher, Collection<ConfigAttribute>> entry : requestMap.entrySet()) {
+			if (entry.getKey().matches(request)) {
+				return entry.getValue();
+			}
+        }*/
+        
         for (Map.Entry<RequestMatcher, Collection<ConfigAttribute>> entry : requestMap.entrySet()) {
-        	System.out.println(entry.getKey());
-        	System.out.println(entry.getValue());
-/*            if (entry.getKey().matches(request)) {
-                return entry.getValue();
-            }*/
+        	if (entry.getKey().matches(request)) {
+        		ConfigAttributeImpl configAttributeImpl=new ConfigAttributeImpl();
+        		configAttributeImpl.getAttributeSet().addAll(entry.getValue());
+        		attributes.add(configAttributeImpl);
+        	}
         }
-        return null;
+        return attributes;
     }
 
     public boolean supports(Class<?> clazz) {
@@ -88,3 +96,4 @@ public class EgovReloadableFilterInvocationSecurityMetadataSource implements Fil
     	LOGGER.info("Secured Url Resources - Role Mappings reloaded at Runtime!");
     }
 }
+
