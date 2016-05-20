@@ -13,19 +13,22 @@ import egovframework.com.cop.ems.service.SndngMailVO;
 import egovframework.com.sym.prm.service.EgovProgrmManageService;
 import egovframework.com.sym.prm.service.ProgrmManageDtlVO;
 import egovframework.com.sym.prm.service.ProgrmManageVO;
-
 import egovframework.rte.fdl.property.EgovPropertyService;
 import egovframework.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
+import egovframework.wavus.util.model.JsonModel;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springmodules.validation.commons.DefaultBeanValidator;
 
 /**
@@ -93,15 +96,28 @@ public class EgovProgrmManageController {
         return "egovframework/com/sym/prm/EgovProgramListDetailSelectUpdt";
     }
 
+    
+    /**
+     * 프로그램목록 리스트조회화면으로 이동한다.
+     * @param searchVO ComDefaultVO
+     * @return 출력페이지정보 "sym/prm/EgovProgramListManage"
+     * @exception Exception
+     */
+    @IncludedInfo(name="프로그램관리",order = 1111 ,gid = 60)
+    @RequestMapping(value="/sym/prm/EgovProgramListManageSelectVw.do")
+    public String selectProgrmListVw()throws Exception {
+      	return "egovframework/com/sym/prm/EgovProgramListManage.axisj-layout";
+    }
+    
     /**
      * 프로그램목록 리스트조회한다.
      * @param searchVO ComDefaultVO
      * @return 출력페이지정보 "sym/prm/EgovProgramListManage"
      * @exception Exception
      */
-    @IncludedInfo(name="프로그램관리",order = 1111 ,gid = 60)
+    @ResponseBody
     @RequestMapping(value="/sym/prm/EgovProgramListManageSelect.do")
-    public String selectProgrmList(
+    public JsonModel selectProgrmList(
     		@ModelAttribute("searchVO") ComDefaultVO searchVO,
     		ModelMap model)
             throws Exception {
@@ -109,7 +125,7 @@ public class EgovProgrmManageController {
     	Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
     	if(!isAuthenticated) {
     		model.addAttribute("message", egovMessageSource.getMessage("fail.common.login"));
-        	return "egovframework/com/uat/uia/EgovLoginUsr";
+        	//return "egovframework/com/uat/uia/EgovLoginUsr";
     	}
     	// 내역 조회
     	/** EgovPropertyService.sample */
@@ -134,10 +150,60 @@ public class EgovProgrmManageController {
 		paginationInfo.setTotalRecordCount(totCnt);
         model.addAttribute("paginationInfo", paginationInfo);
 
-      	return "egovframework/com/sym/prm/EgovProgramListManage";
+        JsonModel jsonModel=new JsonModel();
+        jsonModel.putData("list", list_progrmmanage);
+        jsonModel.setPaginationInfo(paginationInfo);
+      	return jsonModel;
 
     }
 
+    
+    
+    /**
+     * 프로그램목록 리스트조회한다.
+     * @param searchVO ComDefaultVO
+     * @return 출력페이지정보 "sym/prm/EgovProgramListManage"
+     * @exception Exception
+     */
+/*    @IncludedInfo(name="프로그램관리",order = 1111 ,gid = 60)
+    @RequestMapping(value="/sym/prm/EgovProgramListManageSelect.do")
+    public String selectProgrmList(
+    		@ModelAttribute("searchVO") ComDefaultVO searchVO,
+    		ModelMap model)
+            throws Exception {
+        // 0. Spring Security 사용자권한 처리
+    	Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+    	if(!isAuthenticated) {
+    		model.addAttribute("message", egovMessageSource.getMessage("fail.common.login"));
+        	return "egovframework/com/uat/uia/EgovLoginUsr";
+    	}
+    	// 내역 조회
+    	*//** EgovPropertyService.sample *//*
+    	searchVO.setPageUnit(propertiesService.getInt("pageUnit"));
+    	searchVO.setPageSize(propertiesService.getInt("pageSize"));
+
+    	*//** pageing *//*
+    	PaginationInfo paginationInfo = new PaginationInfo();
+		paginationInfo.setCurrentPageNo(searchVO.getPageIndex());
+		paginationInfo.setRecordCountPerPage(searchVO.getPageUnit());
+		paginationInfo.setPageSize(searchVO.getPageSize());
+
+		searchVO.setFirstIndex(paginationInfo.getFirstRecordIndex());
+		searchVO.setLastIndex(paginationInfo.getLastRecordIndex());
+		searchVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
+
+        List<?> list_progrmmanage = progrmManageService.selectProgrmList(searchVO);
+        model.addAttribute("list_progrmmanage", list_progrmmanage);
+        model.addAttribute("searchVO", searchVO);
+
+        int totCnt = progrmManageService.selectProgrmListTotCnt(searchVO);
+		paginationInfo.setTotalRecordCount(totCnt);
+        model.addAttribute("paginationInfo", paginationInfo);
+
+      	return "egovframework/com/sym/prm/EgovProgramListManage.axisj-layout";
+
+    }
+*/
     /**
      * 프로그램목록 멀티 삭제한다.
      * @param checkedProgrmFileNmForDel String

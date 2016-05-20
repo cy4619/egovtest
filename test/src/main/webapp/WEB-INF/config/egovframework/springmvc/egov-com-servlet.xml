@@ -5,6 +5,9 @@
 		<context:exclude-filter expression="org.springframework.stereotype.Service" type="annotation"/>
 		<context:exclude-filter expression="org.springframework.stereotype.Repository" type="annotation"/>
 	</context:component-scan>
+	
+	<!-- JSonView -->
+	<bean id="jsonView" class="egovframework.com.ext.jfile.view.JSonView" />
 
 	<!-- For Pagination Tag -->
 	<bean class="egovframework.com.cmm.ImagePaginationRenderer" id="imageRenderer"/>
@@ -17,9 +20,16 @@
 		</property>
 	</bean>
 
+	<!-- JSON 컨버터 추가 - 김성천 -->
+	<bean id="jacksonMessageConverter" class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"></bean>
     <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
         <property name="webBindingInitializer">
             <bean class="egovframework.com.cmm.web.EgovBindingInitializer"/>
+        </property>
+        <property name="messageConverters">
+			<list>
+				<ref bean="jacksonMessageConverter"/>
+			</list> 	
         </property>
     </bean>
     <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>

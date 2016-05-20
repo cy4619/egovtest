@@ -117,14 +117,23 @@
 	</bean>
 	
 	<bean id="consensusBased" class="egovframework.com.cmm.util.ConsensusBased">
-	<property name="decisionVoters">
+	<constructor-arg>
 		<list>
 			<bean class="org.springframework.security.access.vote.RoleVoter">
 				<property name="rolePrefix" value="ROLE_" />
 			</bean>
 			<bean class="org.springframework.security.access.vote.AuthenticatedVoter" />
 		</list>
-	</property>
+	</constructor-arg>
+	<property name="allowIfAllAbstainDecisions" value="true"></property>
+<!-- 	<property name="decisionVoters">
+		<list>
+			<bean class="org.springframework.security.access.vote.RoleVoter">
+				<property name="rolePrefix" value="ROLE_" />
+			</bean>
+			<bean class="org.springframework.security.access.vote.AuthenticatedVoter" />
+		</list>
+	</property> -->
 	</bean>
 
 	<bean id="databaseSecurityMetadataSource" class="egovframework.com.cmm.util.EgovReloadableFilterInvocationSecurityMetadataSource">

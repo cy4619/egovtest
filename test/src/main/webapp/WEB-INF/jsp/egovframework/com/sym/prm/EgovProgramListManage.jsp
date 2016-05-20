@@ -1,296 +1,310 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<%@ page contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
-<%
- /**
-  * @Class Name : EgovProgramListManage.jsp
-  * @Description : 프로그램목록 조회 화면
-  * @Modification Information
-  * @
-  * @  수정일         수정자                   수정내용
-  * @ -------    --------    ---------------------------
-  * @ 2009.03.10    이용          최초 생성
-  *
-  *  @author 공통서비스 개발팀 이용
-  *  @since 2009.03.10
-  *  @version 1.0
-  *  @see
-  *
-  */
-  /* Image Path 설정 */
-  String imagePath_icon   = "/images/egovframework/com/sym/prm/icon/";
-  String imagePath_button = "/images/egovframework/com/sym/prm/button/";
-%>
-<html lang="ko">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
-<link rel="stylesheet" href="<c:url value='/css/egovframework/com/com.css' />" type="text/css">
-<link rel="stylesheet" href="<c:url value='/css/egovframework/com/button.css' />" type="text/css">
-<title>프로그램목록리스트</title>
-<style type="text/css">
-	h1 {font-size:12px;}
-	caption {visibility:hidden; font-size:0; height:0; margin:0; padding:0; line-height:0;}
-</style>
+<script type="text/javascript">
+	/**
+	 * Require Files for AXISJ UI Component...
+	 * Based        : jQuery
+	 * Javascript    : AXJ.js, AXGrid.js, AXInput.js, AXSelect.js
+	 * CSS            : AXJ.css, AXGrid.css, AXButton.css, AXInput.css, AXSelect.css
+	 */
+	var pageID = "editor";
+	var fnGridObj = {
+		pageStart : function() {
+			fnGridObj.grid.bind();
+		},
+		grid : {
+			target : new AXGrid(),
+			bind : function() {
+				window.progrmGrid = fnGridObj.grid.target;
 
-<script language="javascript1.2" type="text/javaScript">
-<!--
-/* ********************************************************
- * 모두선택 처리 함수
- ******************************************************** */
-function fCheckAll() {
-    var checkField = document.progrmManageForm.checkField;
-    if(document.progrmManageForm.checkAll.checked) {
-        if(checkField) {
-            if(checkField.length > 1) {
-                for(var i=0; i < checkField.length; i++) {
-                    checkField[i].checked = true;
-                }
-            } else {
-                checkField.checked = true;
-            }
-        }
-    } else {
-        if(checkField) {
-            if(checkField.length > 1) {
-                for(var j=0; j < checkField.length; j++) {
-                    checkField[j].checked = false;
-                }
-            } else {
-                checkField.checked = false;
-            }
-        }
-    }
-}
+				progrmGrid.setConfig({
+					targetID : "PrgListGridTarget",
+	                passiveMode:true,
+	                passiveRemoveHide:false,
+					sort : false,
+					fixedColSeq : 1,
+					fitToWidth:true,
+					colGroup : [
+                    {
+                        key:"no", label:"checkbox", width:"30", align:"center", formatter:"checkbox"
+                    },
+                    {
+                        key: "_CUD", label: "상태", width: "50", align: "center"
+                    },
+					{
+						key : "progrmFileNm",
+						label : "프로그램명(영문명)",
+						width : "200",
+						editor: {
+							type : "text",
+							updateEdit : false,
+							notEmpty: true,
+							updateWith: ["_CD"]
+						}
+					}, {
+						key : "progrmKoreanNm",
+						label : "프로그램명(한글명)",
+						width : "200",
+						editor: {
+							type : "text",
+							notEmpty: true,
+							updateWith: ["_CUD"]
+						}
+					}, {
+						key : "progrmStrePath",
+						label : "프로그램경로",
+						width : "200",
+						editor: {
+							type : "text",
+							notEmpty: true,
+							updateWith: ["_CUD"]
+						}
+					}, {
+						key : "url",
+						label : "URL",
+						width : "200",
+						editor: {
+							type : "text",
+							notEmpty: true,
+							updateWith: ["_CUD"]
+						}
+					} ],
+					colHeadAlign : "center", // 헤드의 기본 정렬 값 ( colHeadAlign 을 지정하면 colGroup 에서 정의한 정렬이 무시되고 colHeadAlign : false 이거나 없으면 colGroup 에서 정의한 속성이 적용됩니다.
+					body : {
+	                    addClass: function(){
+	                        if(this.item._CUD == "C"){
+	                            return "blue";
+	                        }else if(this.item._CUD == "D"){
+	                            return "red";
+	                        }else if(this.item._CUD == "U"){
+	                            return "green";
+	                        }else{
+	                            return "";
+	                        }
+	                    },
+						onclick : function() {
+							console.log(progrmGrid.validateCheck('C'));
+							progrmGrid.validateCheck('U');
+							//mask.open(); // 열기 명령
 
-/* ********************************************************
- * 멀티삭제 처리 함수
- ******************************************************** */
-function fDeleteProgrmManageList() {
-    var checkField = document.progrmManageForm.checkField;
-    var ProgrmFileNm = document.progrmManageForm.checkProgrmFileNm;
-    var checkProgrmFileNms = "";
-    var checkedCount = 0;
-    if(checkField) {
-    	if(checkField.length > 1) {
-            for(var i=0; i < checkField.length; i++) {
-                if(checkField[i].checked) {
-                    checkProgrmFileNms += ((checkedCount==0? "" : ",") + ProgrmFileNm[i].value);
-                    checkedCount++;
-                }
-            }
-        } else {
-            if(checkField.checked) {
-            	checkProgrmFileNms = ProgrmFileNm.value;
-            }
-        }
-    }
+/* 							mask.blink([
+								{css:{opacity: "0.1"}, time:500},
+								{css:{opacity: "0.8"}, time:500}
+							]); */
 
-    document.progrmManageForm.checkedProgrmFileNmForDel.value=checkProgrmFileNms;
-    document.progrmManageForm.action = "<c:url value='/sym/prm/EgovProgrmManageListDelete.do'/>";
-    document.progrmManageForm.submit();
-}
+							//mask.close(); // 닫기 명령
 
-/* ********************************************************
- * 페이징 처리 함수
- ******************************************************** */
-function linkPage(pageNo){
-//	document.menuManageForm.searchKeyword.value =
-	document.progrmManageForm.pageIndex.value = pageNo;
-	document.progrmManageForm.action = "<c:url value='/sym/prm/EgovProgramListManageSelect.do'/>";
-   	document.progrmManageForm.submit();
-}
+							//trace(this.index);
+						}
+					},
+					page : {
+				        paging  : true // {Boolean} -- 페이징 사용여부를 설정합니다.
+					},
+	                filter:function(id){
+	                    return true;
+		            }/* ,
+		            selectList : function(pageNo,searchKeyword){
+		 				$.ajax({
+		 				    url : '/sym/prm/EgovProgramListManageSelect.do',
+		 				    data : {
+		 				    	pageIndex : pageNo,
+		 				    	searchKeyword : searchKeyword
+		 				    },
+		 				    dataType : 'JSON',
+		 				    type : 'POST' ,
+		 				    success : function (res) {
+		 				    	mask.close();
+		 				    	var gridData={
+		 				    			list:res.data.list,
+		 				    		    page:{
+		 				    		        pageNo: res.paginationInfo.currentPageNo,
+		 				    		        pageSize: res.paginationInfo.pageSize,
+		 				    		        pageCount: res.paginationInfo.totalPageCount,
+		 				    		        listCount: res.paginationInfo.totalRecordCount,
+		 				    		        onchange: function(pageNo){
+		 				    		        	mask.open();
+		 				    		            //dialog.push(Object.toJSON(this));
+		 				    		        	callAjax(pageNo);	
+		 				    		        }
+		 				    		    }
+		 				    	}
+		 				    	progrmGrid.setData(gridData);
+		 				    }
+		 				});
+		            } */
+				});
+				console.log(progrmGrid)
+				console.log(fnGridObj);
+				//progrmGrid.selectList(1,'');
+				
+ 				var callAjax = function(pageNo,searchKeyword){
+	 				$.ajax({
+	 				    url : '/sym/prm/EgovProgramListManageSelect.do',
+	 				    data : {
+	 				    	pageIndex : pageNo,
+	 				    	searchKeyword : searchKeyword
+	 				    },
+	 				    dataType : 'JSON',
+	 				    type : 'POST' ,
+	 				    success : function (res) {
+	 				    	mask.close();
+	 				    	var gridData={
+	 				    			list:res.data.list,
+	 				    		    page:{
+	 				    		        pageNo: res.paginationInfo.currentPageNo,
+	 				    		        pageSize: res.paginationInfo.pageSize,
+	 				    		        pageCount: res.paginationInfo.totalPageCount,
+	 				    		        listCount: res.paginationInfo.totalRecordCount,
+	 				    		        onchange: function(pageNo){
+	 				    		        	mask.open();
+	 				    		            //dialog.push(Object.toJSON(this));
+	 				    		        	callAjax(pageNo);	
+	 				    		        }
+	 				    		    }
+	 				    	}
+	 				    	progrmGrid.setData(gridData);
+	 				    }
+	 				});
+				}
+				callAjax(1);
+				//progrmGrid.validateCheck('C');
+				//fnGridObj.grid.selectItemList(1);
 
-/* ********************************************************
- * 조회 처리 함수
- ******************************************************** */
-function selectProgramListManage() {
-	document.progrmManageForm.pageIndex.value = 1;
-	document.progrmManageForm.action = "<c:url value='/sym/prm/EgovProgramListManageSelect.do'/>";
-	document.progrmManageForm.submit();
-}
-/* ********************************************************
- * 입력 화면 호출 함수
- ******************************************************** */
-function insertProgramListManage() {
-   	document.progrmManageForm.action = "<c:url value='/sym/prm/EgovProgramListRegist.do'/>";
-   	document.progrmManageForm.submit();
-}
-/* ********************************************************
- * 상세조회처리 함수
- ******************************************************** */
-function selectUpdtProgramListDetail(progrmFileNm) {
-	document.progrmManageForm.tmp_progrmNm.value = progrmFileNm;
-   	document.progrmManageForm.action = "<c:url value='/sym/prm/EgovProgramListDetailSelect.do'/>";
-   	document.progrmManageForm.submit();
-}
-/* ********************************************************
- * focus 시작점 지정함수
- ******************************************************** */
- function fn_FocusStart(){
-		var objFocus = document.getElementById('F1');
-		objFocus.focus();
-	}
-
-<c:if test="${!empty resultMsg}">alert("${resultMsg}");</c:if>
--->
+			},
+			getExcel : function(type) {
+				var obj = progrmGrid.getExcelFormat(type, function() {
+					return this.key != "no" && this.key != "finder";
+				});
+				$("#printout").html(obj);
+			},
+			getSelectedItem : function() {
+				trace(this.target.getSelectedItem());
+				toast.push('콘솔창에 데이터를 출력하였습니다.');
+			},
+			append : function() {
+				this.target.pushList({
+					progrmFileNm : "",
+					progrmKoreanNm : "",
+					progrmStrePath : "",
+					url : ""
+				});
+				this.target.setFocus(this.target.list.length - 1);
+			},
+			remove : function() {
+				var checkedList = progrmGrid.getCheckedListWithIndex(0);// colSeq
+				if (checkedList.length == 0) {
+					alert("선택된 목록이 없습니다. 삭제하시려는 목록을 체크하세요");
+					return;
+				}
+				this.target.removeListIndex(checkedList);
+				// 전달한 개체와 비교하여 일치하는 대상을 제거 합니다. 이때 고유한 값이 아닌 항목을 전달 할 때에는 에러가 발생 할 수 있습니다.
+			},
+			submit : function(){
+				
+			},
+			selectItemList : function(pageNo){
+ 				console.log(progrmGrid);
+				console.log("test")
+	 				$.ajax({
+ 				    url : '/sym/prm/EgovProgramListManageSelect.do',
+ 				    data : {
+ 				    	pageIndex : pageNo,
+ 				    	searchKeyword : searchKeyword
+ 				    },
+ 				    dataType : 'JSON',
+ 				    type : 'POST' ,
+ 				    success : function (res) {
+ 				    	var gridData={
+ 				    			list:res.data.list,
+ 				    		    page:{
+ 				    		        pageNo: res.paginationInfo.currentPageNo,
+ 				    		        pageSize: res.paginationInfo.pageSize,
+ 				    		        pageCount: res.paginationInfo.totalPageCount,
+ 				    		        listCount: res.paginationInfo.totalRecordCount,
+ 				    		        onchange: function(pageNo){
+ 				    		            //dialog.push(Object.toJSON(this));
+ 				    		        	progrmGrid.selectItemList(pageNo);	
+ 				    		        }
+ 				    		    }
+ 				    	}
+ 				    	progrmGrid.setData(gridData);
+ 				    }
+ 				});
+			}
+		}
+	};
+	jQuery(document.body).ready(function() {
+		fnGridObj.pageStart();
+		//fnGridObj.grid.selectItemList(1);
+		//fnGridObj.grid.callAjax(1)
+	});
 </script>
-</head>
-<body>
-<noscript class="noScriptTitle">자바스크립트를 지원하지 않는 브라우저에서는 일부 기능을 사용하실 수 없습니다.</noscript>
-<div id="border" style="width:730px">
-<table border="0">
-  <tr>
-    <td width="700">
-<!-- ********** 여기서 부터 본문 내용 *************** -->
 
-<form name="progrmManageForm" action ="<c:url value='/sym/prm/EgovProgramListManageSelect.do' />" method="post">
-<input name="pageIndex" type="hidden" value="<c:out value='${searchVO.pageIndex}'/>"/>
-<input name="checkedProgrmFileNmForDel" type="hidden" />
-<DIV id="main" style="display:">
+<div class="ax-body">
+	<div class="ax-wrap">
+		<div class="ax-layer ax-title">
+			<div class="ax-col-12 ax-content">
+				<h1>프로그램</h1>
+				<p class="desc">프로그램관리</p>
+			</div>
+			<div class="ax-clear"></div>
+		</div>
+		<div class="ax-layer">
+			<div class="ax-col-12 ax-content">
 
-<table width="791" cellpadding="8" cellspacing="1" class="table-search" border="0">
- <tr>
-  <td width="40%"class="title_left">
-   <h1><img src="<c:url value='/images/egovframework/com/cmm/icon/tit_icon.gif' />" width="16" height="16" hspace="3" alt="">&nbsp;프로그램목록관리</h1></td>
- </tr>
-</table>
-<table width="791" border="0" cellpadding="0" cellspacing="1">
- <tr>
-  <td width="100%">
-    <table width="100%" border="0" cellspacing="1" class="table-register" summary="프로그램목록관리 검색조건">
-   	<caption>프로그램목록관리</caption>
-      <tr>
-        <th width="20%" height="40" class="" scope="row"><label for="searchKeyword">프로그램명</label><img src="<c:url value='/images/egovframework/com/cmm/icon/required.gif' />" width="15" height="15" alt="필수입력표시"></th>
-        <td width="80%">
-          <table border="0" cellspacing="0" cellpadding="0" align="left">
-            <tr>
-              <td >&nbsp;<input name="searchKeyword" type="text" size="60" value="${searchVO.searchKeyword}"  maxlength="60" id="F1" title="검색조건"></td>
-              <td width="5%"></td>
-              <td><span class="button"><input type="submit" value="<spring:message code="button.inquire" />" onclick="selectProgramListManage(); return false;"></span></td>
-              <td width="5%"></td>
-              <td width="20%"><span class="button"><a href="<c:url value='/sym/prm/EgovProgramListRegist.do'/>" onclick="insertProgramListManage(); return false;"><spring:message code="button.create" /></a></span></td>
-              <td width="5%"></td>
-              <td width="20%"><span class="button"><a href="#LINK" onclick="fDeleteProgrmManageList(); return false;"><spring:message code="button.delete" /></a></span></td>
-              <td width="50"></td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-   </td>
- </tr>
-</table>
-<table width="791" border="0" cellspacing="0" cellpadding="0">
-  <tr>
-    <td width="75%">&nbsp;</td>
-    <td width="25%" height="10">&nbsp;
-    </td>
-  </tr>
-</table>
-<table width="791" border="0" cellspacing="0" cellpadding="0">
-  <tr>
-    <td height="10">&nbsp; </td>
-  </tr>
-</table>
-<table width="717" cellpadding="8" class="table-line" style="table-layout:fixed" summary="프로그램목록관리 목록으로 프로그램파일명, 프로그램명, url,프로그램설명 으로 구성">
-   	<caption>프로그램목록관리 목록</caption>
- <thead>
-  <tr>
-    <th class="title" width="20" scope="col">
-    <input type="checkbox" name="checkAll" class="check2" onclick="javascript:fCheckAll();" title="전체선택">
-    </th>
-    <th class="title" width="150" scope="col">프로그램파일명</th>
-    <th class="title" width="137" scope="col">프로그램명</th>
-    <th class="title" width="260" scope="col">URL</th>
-    <th class="title" width="150" scope="col">프로그램설명</th>
-  </tr>
- </thead>
- <tbody>
- <%-- 데이터를 없을때 화면에 메세지를 출력해준다 --%>
- <c:if test="${fn:length(list_progrmmanage) == 0}">
- <tr>
- <td class="lt_text3" colspan="5">
-	<spring:message code="common.nodata.msg" />
- </td>
- </tr>
- </c:if>
- <c:forEach var="result" items="${list_progrmmanage}" varStatus="status">
-  <tr>
-    <td class="lt_text3" nowrap>
-       <input type="checkbox" name="checkField" class="check2" title="선택">
-       <input name="checkProgrmFileNm" type="hidden" value="<c:out value='${result.progrmFileNm}'/>"/>
-    </td>
-    <td class="lt_text" style="cursor:hand;" nowrap>
-            <span class="link"><a href="<c:url value='/sym/prm/EgovProgramListDetailSelect.do'/>?tmp_progrmNm=<c:out value="${result.progrmFileNm}"/>"  onclick="selectUpdtProgramListDetail('<c:out value="${result.progrmFileNm}"/>'); return false;">
+				<div id="CXPage">
+					<div class="ax-layer">
+						<div class="ax-col-12">
+							<div class="ax-unit">
+								<div class="ax-box">
+									<div>
+										<!-- <div id="demoPageTabTarget" class="AXdemoPageTabTarget"></div> -->
+										<div class="AXdemoPageContent">
+												<h2>AXGrid</h2>
+<!-- 												<div style="padding: 10px;">
+													<input type="button" value="forExcel html with filter"
+														class="AXButton" onclick="fnGridObj.grid.getExcel('html');" />
+												</div> -->
+												<div class="AXSearch dx">
+													<div class="searchGroup">
+														<div class="ax-col-6">
+															<span>프로그램명</span>
+															<input type="text" name="searchKeyword" title="" placeholder="" value="" class="AXInput searchInputTextItem" id="searchKeyword">
+															<button type="button" class="AXButton Blue" id="ax-search-btn-search" onclick="fnGridObj.callAjax(1,'searchKeyword.value')"><i class="axi axi-ion-android-search"></i> 검색</button>
+														</div>
+														<div class="ax-col-6">
+														<div class="right">
+																    	<button type="button" class="AXButton Blue" onclick="fnGridObj.grid.append();"><i class="axi axi-plus-circle"></i>추가</button> 
+																        <button type="button" class="AXButton Green" id="ax-grid-btn-regist"><i class="axi axi-bmg-value-fit"></i>적용</button>
+																        <button type="button" class="AXButton Red" onclick="fnGridObj.grid.remove();"><i class="axi axi-minus-circle"></i> 삭제</button>
+																    <!-- <div class="ax-clear"></div> -->
+														</div>
+														</div>
+													</div>
+												</div>
 
-            <c:if test="${fn:length(result.progrmFileNm)> 22}">
-		    	<c:out value="${fn:substring(result.progrmFileNm,0, 22)}"/>...
-		    </c:if>
-		    <c:if test="${fn:length(result.progrmFileNm)<= 22}">
-		    	<c:out value="${result.progrmFileNm}"/>
-		    </c:if>
+												<div id="PrgListGridTarget" style="height: 300px;"></div>
+<!-- 												<div style="padding: 10px;">
+													<input type="button" value="getSelectedItem"
+														class="AXButton" onclick="fnGridObj.grid.getSelectedItem();" />
+													<input type="button" value="추가하기" class="AXButton Red"
+														onclick="fnGridObj.grid.append();" /> <input type="button"
+														value="삭제하기" class="AXButton Red"
+														onclick="fnGridObj.grid.remove();" />
+												</div> -->
 
-            </a></span>
-    </td>
-    <td class="lt_text" nowrap>
-    <c:if test="${fn:length(result.progrmKoreanNm)> 12}">
-    	<c:out value="${fn:substring(result.progrmKoreanNm,0, 12)}"/>...
-    </c:if>
-    <c:if test="${fn:length(result.progrmKoreanNm)<= 12}">
-    	<c:out value="${result.progrmKoreanNm}"/>
-    </c:if>
-    </td>
-    <td class="lt_text" nowrap>
-    <c:if test="${fn:length(result.URL)> 35}">
-    	<c:out value="${fn:substring(result.URL,0, 35)}"/>...
-    </c:if>
-    <c:if test="${fn:length(result.URL)<= 35}">
-    	<c:out value="${result.URL}"/>
-    </c:if>
-
-    </td>
-    <td class="lt_text" nowrap><c:out value="${result.progrmDc}"/></td>
-  </tr>
- </c:forEach>
- </tbody>
- <!--tfoot>
-  <tr class="">
-   <td colspan=6 align="center"></td>
-  </tr>
- </tfoot -->
-</table>
-<table width="717" border="0" cellspacing="0" cellpadding="0">
-  <tr>
-    <td height="10"></td>
-  </tr>
-  <tr>
-    <td height="10">
-<!-- 페이징 시작 -->
-<div align="center">
-  <div>
-	<ui:pagination paginationInfo = "${paginationInfo}"	type="image" jsFunction="linkPage"/>
-  </div>
+										</div>
+									</div>
+								</div>
+								<!-- ax-box -->
+							</div>
+							<!-- ax-unit -->
+						</div>
+						<!-- ax-col-12 -->
+					</div>
+					<!-- ax-layer -->
+				</div>
+				<!-- CXPage -->
+				
+			</div>
+		</div>
+	</div>
 </div>
-<!-- 페이징 끝 -->
-    </td>
-  </tr>
-</table>
-
-
-</DIV>
-
-
-<input type="hidden" name="cmd">
-<input type="hidden" name="tmp_progrmNm">
-</form>
-<!-- ********** 여기까지 내용 *************** -->
-</td>
-</tr>
-</table>
-</DIV>
-</body>
-</html>
-
