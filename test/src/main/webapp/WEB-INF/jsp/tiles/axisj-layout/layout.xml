@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE tiles-definitions PUBLIC  
+        "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"  
+        "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+
+	<!-- 부트스트랩 레이아웃 -->	
+	<definition name="axisj-layout" template="/WEB-INF/jsp/tiles/axisj-layout/template.jsp">
+		<put-attribute name="header" 	value="/WEB-INF/jsp/tiles/axisj-layout/header.jsp" />
+		<put-attribute name="content" 		value="" />
+		<put-attribute name="footer" 	value="/WEB-INF/jsp/tiles/axisj-layout/footer.jsp" />
+	</definition>
+	
+	<definition name="*.axisj-layout" extends="axisj-layout">
+	  	<put-attribute name="content"   value="/WEB-INF/jsp/{1}.jsp" />
+	</definition>	
+	
+	<definition name="*/*.axisj-layout" extends="axisj-layout">
+	  	<put-attribute name="content"   value="/WEB-INF/jsp/{1}/{2}.jsp" />
+	</definition>
+	
+	<definition name="*/*/*.axisj-layout" extends="axisj-layout">
+	  	<put-attribute name="content"   value="/WEB-INF/jsp/{1}/{2}/{3}.jsp" />
+	</definition>
+
+	<definition name="*/*/*/*.axisj-layout" extends="axisj-layout">
+	  	<put-attribute name="content"   value="/WEB-INF/jsp/{1}/{2}/{3}/{4}.jsp" />
+	</definition>
+	
+	<definition name="*/*/*/*/*.axisj-layout" extends="axisj-layout">
+	  	<put-attribute name="content"   value="/WEB-INF/jsp/{1}/{2}/{3}/{4}/{5}.jsp" />
+	</definition>
+	
+	<definition name="*/*/*/*/*/*.axisj-layout" extends="axisj-layout">
+	  	<put-attribute name="content"   value="/WEB-INF/jsp/{1}/{2}/{3}/{4}/{5}/{6}.jsp" />
+	</definition>
+	
+	<definition name="*/*/*/*/*/*/*.axisj-layout" extends="axisj-layout">
+	  	<put-attribute name="content"   value="/WEB-INF/jsp/{1}/{2}/{3}/{4}/{5}/{6}/{7}.jsp" />
+	</definition>
+
+	<definition name="*/*/*/*/*/*/*/*.axisj-layout" extends="axisj-layout">
+	  	<put-attribute name="content"   value="/WEB-INF/jsp/{1}/{2}/{3}/{4}/{5}/{6}/{7}/{8}.jsp" />
+	</definition>
+	
+</tiles-definitions>
