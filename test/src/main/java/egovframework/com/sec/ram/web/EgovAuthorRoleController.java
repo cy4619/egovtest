@@ -5,9 +5,9 @@ import egovframework.com.cmm.SessionVO;
 import egovframework.com.sec.ram.service.AuthorRoleManage;
 import egovframework.com.sec.ram.service.AuthorRoleManageVO;
 import egovframework.com.sec.ram.service.EgovAuthorRoleManageService;
-
 import egovframework.rte.fdl.property.EgovPropertyService;
 import egovframework.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
+import egovframework.wavus.util.model.JsonModel;
 
 import javax.annotation.Resource;
 
@@ -16,6 +16,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 
@@ -60,7 +61,21 @@ public class EgovAuthorRoleController {
 
         return "egovframework/com/sec/ram/EgovAuthorRoleManage";
     } 
-
+    
+    
+	/**
+	 * 권한별 할당된 롤 목록 조회 화면이동
+	 * 
+	 * @param authorRoleManageVO AuthorRoleManageVO
+	 * @return String
+	 * @exception Exception
+	 */
+    @RequestMapping(value="/sec/ram/EgovAuthorRoleListVw.do")
+	public String selectAuthorRoleListVw(@ModelAttribute("authorRoleManageVO") AuthorRoleManageVO authorRoleManageVO,
+			                            ModelMap model) throws Exception {
+    	return "egovframework/com/sec/ram/EgovAuthorRoleManage.axisj-layout";
+    }
+    
 	/**
 	 * 권한별 할당된 롤 목록 조회
 	 * 
@@ -68,11 +83,51 @@ public class EgovAuthorRoleController {
 	 * @return String
 	 * @exception Exception
 	 */
+    @ResponseBody
+    @RequestMapping(value="/sec/ram/EgovAuthorRoleList.do")
+	public JsonModel selectAuthorRoleList(@ModelAttribute("authorRoleManageVO") AuthorRoleManageVO authorRoleManageVO,
+			                            ModelMap model) throws Exception {
+
+    	/** paging */
+    	PaginationInfo paginationInfo = new PaginationInfo();
+		paginationInfo.setCurrentPageNo(authorRoleManageVO.getPageIndex());
+		paginationInfo.setRecordCountPerPage(authorRoleManageVO.getPageUnit());
+		paginationInfo.setPageSize(authorRoleManageVO.getPageSize());
+		
+		authorRoleManageVO.setFirstIndex(paginationInfo.getFirstRecordIndex());
+		authorRoleManageVO.setLastIndex(paginationInfo.getLastRecordIndex());
+		authorRoleManageVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
+		
+		authorRoleManageVO.setAuthorRoleList(egovAuthorRoleManageService.selectAuthorRoleList(authorRoleManageVO));
+		
+		authorRoleManageVO.setAuthorRoleList(egovAuthorRoleManageService.selectPrgAuthorRoleList(authorRoleManageVO));
+        //model.addAttribute("authorRoleList", authorRoleManageVO.getAuthorRoleList());
+        
+        int totCnt = egovAuthorRoleManageService.selectAuthorRoleListTotCnt(authorRoleManageVO);
+		paginationInfo.setTotalRecordCount(totCnt);
+        model.addAttribute("paginationInfo", paginationInfo);
+
+        model.addAttribute("message", egovMessageSource.getMessage("success.common.select"));
+        
+        JsonModel jsonModel=new JsonModel();
+        jsonModel.putData("list", authorRoleManageVO.getAuthorRoleList());
+        jsonModel.setPaginationInfo(paginationInfo);
+      	return jsonModel;
+	}
+    
+
+/*	*//**
+	 * 권한별 할당된 롤 목록 조회
+	 * 
+	 * @param authorRoleManageVO AuthorRoleManageVO
+	 * @return String
+	 * @exception Exception
+	 *//*
     @RequestMapping(value="/sec/ram/EgovAuthorRoleList.do")
 	public String selectAuthorRoleList(@ModelAttribute("authorRoleManageVO") AuthorRoleManageVO authorRoleManageVO,
 			                            ModelMap model) throws Exception {
 
-    	/** paging */
+    	*//** paging *//*
     	PaginationInfo paginationInfo = new PaginationInfo();
 		paginationInfo.setCurrentPageNo(authorRoleManageVO.getPageIndex());
 		paginationInfo.setRecordCountPerPage(authorRoleManageVO.getPageUnit());
@@ -93,7 +148,7 @@ public class EgovAuthorRoleController {
         
         return "egovframework/com/sec/ram/EgovAuthorRoleManage.bootstrap-layout";
 	}
-    
+    */
 	/**
 	 * 권한정보에 롤을 할당하여 데이터베이스에 등록
 	 * @param authorCode String

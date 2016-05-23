@@ -86,4 +86,17 @@ public class AuthorRoleManageDAO extends EgovComAbstractDAO {
 		return (Integer)select("authorRoleManageDAO.selectAuthorRoleListTotCnt", authorRoleManageVO);
 	}
 
+	
+	/**
+	 * 프로그램 권한 롤 관계정보 목록 조회
+	 * @param authorRoleManageVO AuthorRoleManageVO
+	 * @return List<AuthorRoleManageVO>
+	 * @exception Exception
+	 */
+	@SuppressWarnings("unchecked")
+	public List<AuthorRoleManageVO> selectPrgAuthorRoleList(
+			AuthorRoleManageVO authorRoleManageVO) {
+		return (List<AuthorRoleManageVO>) list("authorRoleManageDAO.selectPrgAuthorRoleList", authorRoleManageVO);
+	}
+
 }

@@ -5,7 +5,6 @@ import java.util.List;
 import egovframework.com.sec.ram.service.AuthorRoleManage;
 import egovframework.com.sec.ram.service.AuthorRoleManageVO;
 import egovframework.com.sec.ram.service.EgovAuthorRoleManageService;
-
 import egovframework.rte.fdl.cmmn.EgovAbstractServiceImpl;
 
 import javax.annotation.Resource;
@@ -90,5 +89,16 @@ public class EgovAuthorRoleManageServiceImpl extends EgovAbstractServiceImpl imp
 	 */
 	public int selectAuthorRoleListTotCnt(AuthorRoleManageVO authorRoleManageVO) throws Exception {
 		return authorRoleManageDAO.selectAuthorRoleListTotCnt(authorRoleManageVO);
+	}
+
+
+	/**
+	 * 프로그램 권한 롤 관계정보 목록 조회
+	 * @param authorRoleManageVO AuthorRoleManageVO
+	 * @return List<AuthorRoleManageVO>
+	 */
+	public List<AuthorRoleManageVO> selectPrgAuthorRoleList(
+			AuthorRoleManageVO authorRoleManageVO) {
+		return authorRoleManageDAO.selectPrgAuthorRoleList(authorRoleManageVO);
 	}
 }

@@ -63,6 +63,14 @@ public interface EgovAuthorRoleManageService {
 	 * @return int
 	 * @exception Exception
 	 */
-	public int selectAuthorRoleListTotCnt(AuthorRoleManageVO authorRoleManageVO) throws Exception;	
+	public int selectAuthorRoleListTotCnt(AuthorRoleManageVO authorRoleManageVO) throws Exception;
+
+	/**
+	 * 프로그램 권한 롤 관계정보 목록 조회
+	 * @param authorRoleManageVO AuthorRoleManageVO
+	 * @return List<AuthorRoleManageVO>
+	 * @exception Exception
+	 */
+	public List<AuthorRoleManageVO> selectPrgAuthorRoleList(AuthorRoleManageVO authorRoleManageVO);	
 
 }
