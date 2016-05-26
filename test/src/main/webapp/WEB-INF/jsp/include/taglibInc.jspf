@@ -8,4 +8,3 @@
 <%@ taglib prefix="ckeditor" uri="http://ckeditor.com" %>
 <%@ taglib  prefix="tiles" uri="http://tiles.apache.org/tags-tiles"%>
 <%@ taglib prefix="validator" uri="http://www.springmodules.org/tags/commons-validator" %>
-<%@ taglib prefix="bt" tagdir="/WEB-INF/tags/bootstrap" %>

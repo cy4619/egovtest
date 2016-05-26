@@ -79,7 +79,7 @@
     </delete>
     
     
-    <select id="authorRoleManageDAO.selectAuthorRoleList" parameterClass="authorRoleManageVO" resultMap="authorRole">
+<!--     <select id="authorRoleManageDAO.selectAuthorRoleList" parameterClass="authorRoleManageVO" resultMap="authorRole">
         <![CDATA[
             SELECT  * 
               FROM  (
@@ -107,6 +107,6 @@
              WHERE  RNUM  > #firstIndex#
                AND  RNUM <= #firstIndex# + #recordCountPerPage#
         ]]>
-    </select>    
+    </select>     -->
     
 </sqlMap>

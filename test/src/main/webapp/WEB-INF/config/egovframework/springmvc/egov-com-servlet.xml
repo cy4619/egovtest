@@ -20,7 +20,7 @@
 		</property>
 	</bean>
 
-	<!-- JSON 컨버터 추가 - 김성천 -->
+	<!-- JSON 컨버터 추가 -->
 	<bean id="jacksonMessageConverter" class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"></bean>
     <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
         <property name="webBindingInitializer">
@@ -64,7 +64,7 @@
 		</property>
 	</bean>
 
-	<!-- for JFile -->
+	<!-- BeanName View -->
 	<bean class="org.springframework.web.servlet.view.BeanNameViewResolver" p:order="0"/>
 	
 	<!-- Tiles View -->

@@ -31,7 +31,7 @@
 		<security:logout logout-success-url="/uat/uia/egovLoginUsr.do"/>
 		<!-- for authorization -->
 		<security:custom-filter before="FILTER_SECURITY_INTERCEPTOR" ref="filterSecurityInterceptor"/>
-	</security:http>	
+	</security:http>
  
   	<!-- 인증성공시 분기처리 핸들러 
   		alwaysUseDefaultTargetUrl : 로그인성공시 항상 같은 페이지로 이동할지 여부(boolean)
