@@ -29,7 +29,8 @@ public class ProgrmManageVO{
 	private String url;
 	/** 프로그램설명	 */	
 	private String progrmDc;
-
+	/** 등록,수정,삭제 구분자 */	
+	private String _CUD="";
 	/**
 	 * progrmFileNm attribute를 리턴한다.
 	 * @return String
@@ -100,5 +101,13 @@ public class ProgrmManageVO{
 	public void setProgrmDc(String progrmDc) {
 		this.progrmDc = progrmDc;
 	}
+	public String get_CUD() {
+		return _CUD;
+	}
+	public void set_CUD(String _CUD) {
+		this._CUD = _CUD;
+	}
+	
+	
   
 }

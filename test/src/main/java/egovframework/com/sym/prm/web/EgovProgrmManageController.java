@@ -1,5 +1,6 @@
 package egovframework.com.sym.prm.web;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,13 +20,12 @@ import egovframework.wavus.util.model.JsonModel;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -248,6 +248,22 @@ public class EgovProgrmManageController {
      */
     @RequestMapping(value="/sym/prm/EgovProgramListRegist.do")
     public String insertProgrmList(
+    		@RequestBody List<ProgrmManageVO> progormList,
+    		//@ModelAttribute("progrmManageVO") ProgrmManageForm progrmManageVOList,
+    		// @RequestParam Map<String,Object> map,
+			ModelMap model)
+            throws Exception {
+    	// 0. Spring Security 사용자권한 처리
+    	Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
+    	if(!isAuthenticated) {
+    		model.addAttribute("message", egovMessageSource.getMessage("fail.common.login"));
+        	//return "egovframework/com/uat/uia/EgovLoginUsr";
+    	}
+    	progrmManageService.cudProcess(progormList);
+		return "redirect:/sym/prm/EgovProgramListManageSelect.do";
+    }
+/*    @RequestMapping(value="/sym/prm/EgovProgramListRegist.do")
+    public String insertProgrmList(
     		@RequestParam Map<?, ?> commandMap,
     		@ModelAttribute("progrmManageVO") ProgrmManageVO progrmManageVO,
 			BindingResult bindingResult,
@@ -278,7 +294,7 @@ public class EgovProgrmManageController {
         }
     	model.addAttribute("resultMsg", resultMsg);
 		return sLocationUrl;
-    }
+    }*/
 
     /**
      * 프로그램목록을 수정 한다.

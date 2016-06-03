@@ -161,5 +161,13 @@ public interface EgovProgrmManageService {
 	 * @exception Exception
 	 */
 	ProgrmManageDtlVO selectRqesterEmail(ProgrmManageDtlVO vo) throws Exception;
+	
+	
+	/**
+	 * 프로그램 CUD 작업수행
+	 * @param progrmManageVOList
+	 * @throws Exception
+	 */
+	void cudProcess(List<ProgrmManageVO> progrmManageVOList) throws Exception;
 
 }

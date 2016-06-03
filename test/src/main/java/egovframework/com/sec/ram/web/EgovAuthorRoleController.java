@@ -1,5 +1,7 @@
 package egovframework.com.sec.ram.web;
 
+import java.util.List;
+
 import egovframework.com.cmm.EgovMessageSource;
 import egovframework.com.cmm.SessionVO;
 import egovframework.com.sec.ram.service.AuthorRoleManage;
@@ -11,9 +13,11 @@ import egovframework.wavus.util.model.JsonModel;
 
 import javax.annotation.Resource;
 
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -98,7 +102,7 @@ public class EgovAuthorRoleController {
 		authorRoleManageVO.setLastIndex(paginationInfo.getLastRecordIndex());
 		authorRoleManageVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
 		
-		authorRoleManageVO.setAuthorRoleList(egovAuthorRoleManageService.selectAuthorRoleList(authorRoleManageVO));
+		//authorRoleManageVO.setAuthorRoleList(egovAuthorRoleManageService.selectAuthorRoleList(authorRoleManageVO));
 		
 		authorRoleManageVO.setAuthorRoleList(egovAuthorRoleManageService.selectPrgAuthorRoleList(authorRoleManageVO));
         //model.addAttribute("authorRoleList", authorRoleManageVO.getAuthorRoleList());
@@ -111,6 +115,7 @@ public class EgovAuthorRoleController {
         
         JsonModel jsonModel=new JsonModel();
         jsonModel.putData("list", authorRoleManageVO.getAuthorRoleList());
+        jsonModel.putData("searchKeyword", authorRoleManageVO.getSearchKeyword());
         jsonModel.setPaginationInfo(paginationInfo);
       	return jsonModel;
 	}
@@ -158,7 +163,32 @@ public class EgovAuthorRoleController {
 	 * @return String
 	 * @exception Exception
 	 */
-	@RequestMapping(value="/sec/ram/EgovAuthorRoleInsert.do")
+	@RequestMapping(value="/sec/ram/EgovAuthorRoleListRegist.do")
+	public String insertAuthorRole(@JsonProperty String progrmFileId,
+			                       @RequestBody List<AuthorRoleManage> authorRoleList,
+			                         ModelMap model) throws Exception {
+		
+/*    	String [] strRoleCodes = roleCodes.split(";");
+    	String [] strRegYns = regYns.split(";");
+    	
+    	authorRoleManage.setRoleCode(authorCode);
+    	
+    	for(int i=0; i<strRoleCodes.length;i++) {
+    		authorRoleManage.setRoleCode(strRoleCodes[i]);
+    		authorRoleManage.setRegYn(strRegYns[i]);
+    		if(strRegYns[i].equals("Y")){
+    			egovAuthorRoleManageService.deleteAuthorRole(authorRoleManage);//2011.09.07
+    			egovAuthorRoleManageService.insertAuthorRole(authorRoleManage);
+    		}else {
+    			egovAuthorRoleManageService.deleteAuthorRole(authorRoleManage);
+    		}
+    	}
+
+        status.setComplete();*/
+        model.addAttribute("message", egovMessageSource.getMessage("success.common.insert"));		
+		return "forward:/sec/ram/EgovAuthorRoleList.do";
+	}    
+/*	@RequestMapping(value="/sec/ram/EgovAuthorRoleInsert.do")
 	public String insertAuthorRole(@RequestParam("authorCode") String authorCode,
 			                       @RequestParam("roleCodes") String roleCodes,
 			                       @RequestParam("regYns") String regYns,
@@ -185,5 +215,5 @@ public class EgovAuthorRoleController {
         status.setComplete();
         model.addAttribute("message", egovMessageSource.getMessage("success.common.insert"));		
 		return "forward:/sec/ram/EgovAuthorRoleList.do";
-	}    
+	}    */
 }

@@ -6,7 +6,6 @@ import egovframework.com.cmm.ComDefaultVO;
 import egovframework.com.sym.prm.service.EgovProgrmManageService;
 import egovframework.com.sym.prm.service.ProgrmManageDtlVO;
 import egovframework.com.sym.prm.service.ProgrmManageVO;
-
 import egovframework.rte.fdl.cmmn.EgovAbstractServiceImpl;
 
 import javax.annotation.Resource;
@@ -239,6 +238,24 @@ public class EgovProgrmManageServiceImpl extends EgovAbstractServiceImpl impleme
 	public ProgrmManageDtlVO selectRqesterEmail(ProgrmManageDtlVO vo) throws Exception{
        	return progrmManageDAO.selectRqesterEmail(vo);
 	}
-
-
+	
+	
+	/**
+	 * 프로그램 등록,수정,삭제 호출
+	 * @param progrmManageVOList
+	 * @throws Exception
+	 */
+	@Override
+	public void cudProcess(List<ProgrmManageVO> progrmManageVOList)
+			throws Exception {
+		for (ProgrmManageVO progrmManageVO : progrmManageVOList) {
+			if(progrmManageVO.get_CUD().equals("C")){
+				insertProgrm(progrmManageVO);
+			}else if(progrmManageVO.get_CUD().equals("U")){
+				updateProgrm(progrmManageVO);
+			}else if(progrmManageVO.get_CUD().equals("D")){
+				deleteProgrm(progrmManageVO);
+			}
+		}
+	}
 }

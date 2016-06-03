@@ -1,6 +1,6 @@
 <script type="text/javascript">
 
-/* Program Grid */
+	/* Program Grid 목록조회*/
 	var progrmListCallAjax = function(pageNo,searchKeyword){
 			$.ajax({
 			    url : '/sym/prm/EgovProgramListManageSelect.do',
@@ -31,6 +31,40 @@
 			});
 	}
 
+	/* Program Grid 등록*/
+	var progrmRegistCallAjax = function(registData){
+		var params = $(registData).serialize();
+		var params2 = $(registData).serializeArray();
+			$.ajax({
+				contentType: "application/json",
+			    url : '/sym/prm/EgovProgramListRegist.do',
+			    data : JSON.stringify(registData),
+			    dataType : 'JSON',
+			    type : 'POST' ,
+			    success : function (res) {
+			    	dialog.push('정상적으로 적용되었습니다.');
+					authorRoleGridObj.pageStart();
+			    	mask.close();
+			    	var gridData={
+			    			list:res.data.list,
+			    		    page:{
+			    		        pageNo: res.paginationInfo.currentPageNo,
+			    		        pageSize: res.paginationInfo.pageSize,
+			    		        pageCount: res.paginationInfo.totalPageCount,
+			    		        listCount: res.paginationInfo.totalRecordCount,
+			    		        onchange: function(pageNo){
+			    		        	mask.open();
+			    		            //dialog.push(Object.toJSON(this));
+			    		        	progrmListCallAjax(pageNo,searchKeyword);	
+			    		        }
+			    		    }
+			    	}
+			    	progrmGrid.setData(gridData);
+			    }
+			});
+	}
+	
+	
 	var pageID = "editor";
 	var progrmGridObj = {
 		pageStart : function() {
@@ -108,6 +142,10 @@
 	                        }
 	                    },
 						onclick : function() {
+							if(this.item._CUD != 'C' && this.item._CUD != 'D'){
+								$('#roleSearchLayer').hide();
+								authorRoleListCallAjax(1,this.item.progrmFileNm);
+							}
 							//toast.push(Object.toJSON({ "event": "click", "index": this.index, "r": this.r, "c": this.c, "item": this.item }));
 							//progrmGrid.validateCheck('U');
 							//mask.open(); // 열기 명령
@@ -126,7 +164,6 @@
 	                    return true;
 		            }
 				});
-				
 				
 				progrmListCallAjax(1);
 				//progrmGrid.validateCheck('C');
@@ -158,13 +195,16 @@
 			},
 			submit : function(){
 				//적용버튼 클릭시 이벤트
-				
 				//유효성검증
 				if(progrmGrid.validateCheck('U') && progrmGrid.validateCheck('C')){
 					//적용이벤트
 					 axConfirm("변경내역을 적용하시겠습니까?", function(data){
-	        			if (data == "Y") { 
-	        				console.log(progrmGrid.list)
+	        			if (data == "Y") {
+        					progrmRegistCallAjax(progrmGrid.list);
+	        				console.log(progrmGrid.list);
+/* 	        				$(progrmGrid.list).each(function(){
+	        					console.log(this._CUD)
+	        				}) */
 	        				return;
 	        			}
 					 });
@@ -175,16 +215,49 @@
 	/* Program Grid End */
 	
 	/* AuthorRole Grid */
-		var authorRoleListCallAjax = function(pageNo,searchKeyword){
+	var authorRoleListCallAjax = function(pageNo,searchKeyword){
+		$.ajax({
+		    url : '/sec/ram/EgovAuthorRoleList.do',
+		    data : {
+		    	pageIndex : pageNo,
+		    	searchKeyword : searchKeyword
+		    },
+		    dataType : 'JSON',
+		    type : 'POST' ,
+		    success : function (res) {
+		    	$('#roleLabel').text(res.data.searchKeyword);
+		    	mask.close();
+		    	var gridData={
+		    			list:res.data.list,
+		    		    page:{
+		    		        pageNo: res.paginationInfo.currentPageNo,
+		    		        pageSize: res.paginationInfo.pageSize,
+		    		        pageCount: res.paginationInfo.totalPageCount,
+		    		        listCount: res.paginationInfo.totalRecordCount,
+		    		        onchange: function(pageNo){
+		    		        	mask.open();
+		    		            //dialog.push(Object.toJSON(this));
+		    		        	authorRoleListCallAjax(pageNo,searchKeyword);	
+		    		        }
+		    		    }
+		    	}
+		    	authorRoleGrid.setData(gridData);
+		    	$('#roleSearchLayer').show();
+		    }
+		});
+	}
+
+	/* AuthorRole Grid 등록*/
+	var authorRoleRegistCallAjax = function(registData){
+			registData.push({progrmFileId:'aa'});
 			$.ajax({
-			    url : '/sec/ram/EgovAuthorRoleList.do',
-			    data : {
-			    	pageIndex : pageNo,
-			    	searchKeyword : $('#searchKeyword').val()
-			    },
+				contentType: "application/json",
+			    url : '/sec/ram/EgovAuthorRoleListRegist.do',
+			    data : JSON.stringify(registData),
 			    dataType : 'JSON',
 			    type : 'POST' ,
 			    success : function (res) {
+			    	dialog.push('정상적으로 적용되었습니다.');
 			    	mask.close();
 			    	var gridData={
 			    			list:res.data.list,
@@ -196,7 +269,7 @@
 			    		        onchange: function(pageNo){
 			    		        	mask.open();
 			    		            //dialog.push(Object.toJSON(this));
-			    		        	authorRoleListCallAjax(pageNo,searchKeyword);	
+			    		        	authorRoleListCallAjax(pageNo,searchKeyword);
 			    		        }
 			    		    }
 			    	}
@@ -204,7 +277,7 @@
 			    }
 			});
 	}
-
+	
 	var authorRoleGridObj = {
 		pageStart : function() {
 			authorRoleGridObj.grid.bind();
@@ -282,17 +355,7 @@
 	                    return true;
 		            }
 				});
-				
-				
-				authorRoleListCallAjax(1);
-				//authorRoleGrid.validateCheck('C');
-				//authorRoleGridObj.grid.selectItemList(1);
-			},
-			getExcel : function(type) {
-				var obj = authorRoleGrid.getExcelFormat(type, function() {
-					return this.key != "no" && this.key != "finder";
-				});
-				$("#printout").html(obj);
+				$('#roleSearchLayer').hide();
 			},
 			getSelectedItem : function() {
 			},
@@ -319,7 +382,7 @@
 					//적용이벤트
 					 axConfirm("변경내역을 적용하시겠습니까?", function(data){
 	        			if (data == "Y") { 
-	        				console.log(authorRoleGrid.list)
+	        				authorRoleRegistCallAjax(authorRoleGrid.list)
 	        				return;
 	        			}
 					 });
@@ -355,14 +418,14 @@
 										<div class="ax-box-wrap">
 										         <div class="AXSearch dx">
 													<div class="searchGroup">
-															<span>프로그램명</span>
-															<input type="text" name="searchKeyword" title="" placeholder="" value="" class="AXInput searchInputTextItem" id="searchKeyword">
-															<button type="button" class="AXButton Blue" id="ax-search-btn-search" onclick="progrmListCallAjax('1');"><i class="axi axi-ion-android-search"></i> 검색</button>
-																    	<button type="button" class="AXButton Blue" onclick="progrmGridObj.grid.append();"><i class="axi axi-plus-circle"></i>추가</button> 
-																        <button type="button" class="AXButton Green" id="ax-grid-btn-regist" onclick="progrmGridObj.grid.submit();"><i class="axi axi-bmg-value-fit"></i>적용</button>
-																        <button type="button" class="AXButton Red" onclick="progrmGridObj.grid.remove();"><i class="axi axi-minus-circle"></i> 삭제</button>
-																    <div class="ax-clear"></div>
-														</div>
+														<span>프로그램명</span>
+														<input type="text" name="searchKeyword" title="" placeholder="" value="" class="AXInput searchInputTextItem" id="searchKeyword">
+														<button type="button" class="AXButton Blue" id="ax-search-btn-search" onclick="progrmListCallAjax('1');"><i class="axi axi-ion-android-search"></i> 검색</button>
+												    	<button type="button" class="AXButton Blue" onclick="progrmGridObj.grid.append();"><i class="axi axi-plus-circle"></i>추가</button> 
+												        <button type="button" class="AXButton Green" id="ax-grid-btn-regist" onclick="progrmGridObj.grid.submit();"><i class="axi axi-bmg-value-fit"></i>적용</button>
+												        <button type="button" class="AXButton Red" onclick="progrmGridObj.grid.remove();"><i class="axi axi-minus-circle"></i> 삭제</button>
+												    	<div class="ax-clear"></div>
+													</div>
 												</div>
 												<div id="PrgListGridTarget"></div>
 										</div>
@@ -374,20 +437,18 @@
 								<div class="ax-unit">
 									<div class="ax-box">
 										<div class="ax-box-wrap">
-<!-- 												 <div class="AXSearch dx">
-													<div class="searchGroup">
-															<span>프로그램명</span>
-															<input type="text" name="searchKeyword" title="" placeholder="" value="" class="AXInput searchInputTextItem" id="searchKeyword">
-															<button type="button" class="AXButton Blue" id="ax-search-btn-search" onclick="progrmListCallAjax('1');"><i class="axi axi-ion-android-search"></i> 검색</button>
-																    	<button type="button" class="AXButton Blue" onclick="progrmGridObj.grid.append();"><i class="axi axi-plus-circle"></i>추가</button> 
-																        <button type="button" class="AXButton Green" id="ax-grid-btn-regist" onclick="progrmGridObj.grid.submit();"><i class="axi axi-bmg-value-fit"></i>적용</button>
-																        <button type="button" class="AXButton Red" onclick="progrmGridObj.grid.remove();"><i class="axi axi-minus-circle"></i> 삭제</button>
-																    <div class="ax-clear"></div>
-														</div>
-												</div> -->
+												 <div class="AXSearch dx">
+													<div class="searchGroup" id="roleSearchLayer" style="display: none;">
+														<span>프로그램명</span>&nbsp&nbsp : &nbsp&nbsp<label style="font: bold; color: black;" id="roleLabel"></label>
+													    	<button type="button" class="AXButton Blue" onclick="authorRoleGridObj.grid.append();"><i class="axi axi-plus-circle"></i>추가</button> 
+													        <button type="button" class="AXButton Green" id="ax-grid-btn-regist" onclick="authorRoleGridObj.grid.submit();"><i class="axi axi-bmg-value-fit"></i>적용</button>
+													        <button type="button" class="AXButton Red" onclick="authorRoleGridObj.grid.remove();"><i class="axi axi-minus-circle"></i> 삭제</button>
+														<div class="ax-clear"></div>
+													</div>
+												</div>
 												<div class="AXSearch dx">
 													<div class="searchGroup">
-														<span>권한명</span>
+														<span>권한목록</span>
 													</div>
 												</div>
 												<div id="AuthorRoleGridTarget"></div>

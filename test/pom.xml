@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
     <groupId>egov</groupId>
     <artifactId>test</artifactId>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
     <version>1.0.0</version>
     <name>test</name>
     <url>http://www.egovframe.go.kr</url>

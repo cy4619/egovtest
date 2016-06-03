@@ -17,6 +17,7 @@
         <result property="authorCode" column="AUTHOR_CODE" columnIndex="7"/>
         <result property="regYn" column="REG_YN" columnIndex="8"/>
         <result property="creatDt" column="CREAT_DT" columnIndex="9"/>
+		<result property="progrmFileNm" column="PROGRM_FILE_NM" columnIndex="10"/>
     </resultMap>
 
     <select id="authorRoleManageDAO.selectAuthorRoleList" parameterClass="authorRoleManageVO" resultMap="authorRole">
@@ -79,7 +80,7 @@
     </delete>
     
     
-<!--     <select id="authorRoleManageDAO.selectAuthorRoleList" parameterClass="authorRoleManageVO" resultMap="authorRole">
+    <select id="authorRoleManageDAO.selectPrgAuthorRoleList" parameterClass="authorRoleManageVO" resultMap="authorRole">
         <![CDATA[
             SELECT  * 
               FROM  (
@@ -92,13 +93,14 @@
                    A.ROLE_DC,
                    A.ROLE_TY,
                    A.ROLE_SORT,
-                   B.AUTHOR_CODE,
+                   '' AS AUTHOR_CODE,
                    B.CREAT_DT,
                    (CASE WHEN B.ROLE_CODE IS NULL THEN 'N'
                          ELSE 'Y' 
-                     END) AS REG_YN
+                     END) AS REG_YN,
+                   B.PROGRM_FILE_NM
               FROM COMTNROLEINFO A 
-                   LEFT OUTER JOIN (SELECT AUTHOR_CODE , ROLE_CODE, CREAT_DT FROM COMTNPROGRMROLERELATE WHERE AUTHOR_CODE = #searchKeyword#) B
+                   RIGHT OUTER JOIN (SELECT PROGRM_FILE_NM , ROLE_CODE, CREAT_DT FROM COMTNPROGRMROLERELATE WHERE PROGRM_FILE_NM = #searchKeyword#) B
                 ON A.ROLE_CODE = B.ROLE_CODE        
 
                     ) ALL_LIST
@@ -107,6 +109,6 @@
              WHERE  RNUM  > #firstIndex#
                AND  RNUM <= #firstIndex# + #recordCountPerPage#
         ]]>
-    </select>     -->
+    </select>    
     
 </sqlMap>

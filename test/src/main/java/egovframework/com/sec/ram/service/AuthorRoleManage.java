@@ -1,5 +1,7 @@
 package egovframework.com.sec.ram.service;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import egovframework.com.cmm.ComDefaultVO;
 
 /**
@@ -18,7 +20,7 @@ import egovframework.com.cmm.ComDefaultVO;
  *
  * </pre>
  */
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AuthorRoleManage extends ComDefaultVO {
 
 	/**
@@ -33,6 +35,11 @@ public class AuthorRoleManage extends ComDefaultVO {
 	 * 권한코드
 	 */
 	private String authorCode;
+
+	/**
+	 * 프로그램명
+	 */
+	private String progrmFileNm;
 	/**
 	 * 롤코드
 	 */
@@ -65,6 +72,11 @@ public class AuthorRoleManage extends ComDefaultVO {
 	 * 등록일자
 	 */
 	private String creatDt;
+	
+	/**
+	 * 등록,수정,삭제 구분
+	 */
+	private String _CUD;
 	/**
 	 * authorRole attribute 를 리턴한다.
 	 * @return AuthorRoleManage
@@ -93,6 +105,7 @@ public class AuthorRoleManage extends ComDefaultVO {
 	public void setAuthorCode(String authorCode) {
 		this.authorCode = authorCode;
 	}
+	
 	/**
 	 * roleCode attribute 를 리턴한다.
 	 * @return String
@@ -100,6 +113,14 @@ public class AuthorRoleManage extends ComDefaultVO {
 	public String getRoleCode() {
 		return roleCode;
 	}
+	
+	public String getProgrmFileNm() {
+		return progrmFileNm;
+	}
+	public void setProgrmFileNm(String progrmFileNm) {
+		this.progrmFileNm = progrmFileNm;
+	}
+	
 	/**
 	 * roleCode attribute 값을 설정한다.
 	 * @param roleCode String 
@@ -204,6 +225,12 @@ public class AuthorRoleManage extends ComDefaultVO {
 	 */
 	public void setCreatDt(String creatDt) {
 		this.creatDt = creatDt;
+	}
+	public String get_CUD() {
+		return _CUD;
+	}
+	public void set_CUD(String _CUD) {
+		this._CUD = _CUD;
 	}
 	
 	
